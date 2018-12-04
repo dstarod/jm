@@ -158,15 +158,20 @@ def gen_lambda(filter_key, filter_value, exp_name='$eq'):
 
     if filter_key == '$or' and type(filter_value) == list:
         return lambda x: any([
-            gen_lambda(k, v)(x)
-            for f in filter_value for k, v in f.items()
+            all([
+                gen_lambda(k, v)(x)
+                for k, v in f.items()  # all parts of the dict must be true
+            ])
+            for f in filter_value  # for every item in the or-list
         ])
 
     if filter_key == '$nor' and type(filter_value) == list:
         return lambda x: not any([
-            gen_lambda(fd_name, fd_value)(x)
-            for filter_dict in filter_value
-            for fd_name, fd_value in filter_dict.items()
+            all([
+                gen_lambda(k, v)(x)
+                for k, v in f.items()  # all parts of the dict must be true
+            ])
+            for f in filter_value  # for every item in the or-list
         ])
 
     if filter_key == '$elemMatch' and type(filter_value) == dict:
