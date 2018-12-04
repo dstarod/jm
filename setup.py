@@ -23,6 +23,7 @@ if __name__ == '__main__':
         author='dstarod',
         author_email='dmitry.starodubcev@gmail.com',
         scripts=['bin/jf.py'],
+        py_modules=['jsonfilter.match'],
         cmdclass={"install_scripts": StripDot},
         classifiers=['Topic :: Utilities'],
         keywords=['json', 'mongodb'],
