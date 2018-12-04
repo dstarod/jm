@@ -19,7 +19,7 @@ except ImportError:
 # Element: $type
 # Evaluation: $mod, $text, $where
 # Geospatial: $geoWithin, $geoIntersects, $near, $nearSphere
-# Array: $all, $elemMatch
+# Array: $all
 # Comments?
 # Projection Operators?
 
@@ -55,6 +55,20 @@ def exp_regexp(search_string, regex_string):
         raise RegexpError
 
 
+def elem_match(values, filter_expr):
+    """
+    Element match filter function
+    :param values: list - values
+    :param filter_expr: lambda function
+    :return: bool
+    """
+    for val in values:
+        if filter_expr(val):
+            return True
+
+    return False
+
+
 expressions = {
     # Comparison
     "$gt": lambda x, y: x is not NOT_FOUND and x > y,
@@ -70,7 +84,8 @@ expressions = {
     # Evaluation
     "$regex": exp_regexp,
     # Array
-    "$size": lambda x, y: x is not NOT_FOUND and len(x) == y
+    "$size": lambda x, y: x is not NOT_FOUND and len(x) == y,
+    "$elemMatch": elem_match
 }
 
 
@@ -153,6 +168,13 @@ def gen_lambda(filter_key, filter_value, exp_name='$eq'):
             for filter_dict in filter_value
             for fd_name, fd_value in filter_dict.items()
         ])
+
+    if filter_key == '$elemMatch' and type(filter_value) == dict:
+        def filter_func(x): return all([
+            gen_lambda(k, v)(x)
+            for k, v in filter_value.items()
+        ])
+        return lambda x: exp(x, filter_func)
 
     return lambda x: any([
        exp(val, filter_value) for val in get_values(filter_key, x)

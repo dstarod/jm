@@ -37,6 +37,7 @@
 - $or: joins query clauses with a logical OR returns all documents that match the conditions of either clause;
 - $nor: joins query clauses with a logical NOR returns all documents that fail to match both clauses; 
 - $not: inverts the effect of a query expression and returns documents that do not match the query expression.
+- $elemMatch: matches documents that contain an array field with at least one element that matches all the specified query critery
 
 ### Filter example 
 
